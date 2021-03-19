@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <tuple>
 using namespace std;
 string s = "▢⛝◼⛞⛋⬜⧉⬚⟎◳◻⛶□⧠⧈⧇";
 class Boat {
@@ -31,6 +32,7 @@ class Boat {
                 HitCells++;
                 if (HitCells == length*width){
                     state = "dead";
+                    return; // to break out of the function
                 }
             }
         }
@@ -159,6 +161,34 @@ class Player{
     }
 
 };
+int VerifyInput(string s,int length,int width){ //verify the player's input is in the right form i.e E5 , B7
+    int a = int('a');
+    int A = int('A');
+    char c = s[0];
+    int letter = int(c);
+    string s1 = s.substr(1);
+    int numbers = stoi( s1 );
+    if (s.length() != (width / 10) +2){ //verify the length of the input
+        return 0;
+    }
+    if (!(s1.find_first_not_of( "0123456789" ) == string::npos)){ //verify the rest of the string is numbers
+        return 0;
+    }
+    if (!(numbers>0 && numbers<=width)){ //verify the numbers are within the appropriate range
+        return 0;
+    }
+    if (!((letter >= a && letter < a+width) || (letter >= A && letter < A+width))){ // verify the letter is within the range of letters i.e [a..g]
+        return 0;
+    }
+    return 1;
+}
+tuple <int,int> TransformInput(string s){ // transform the input into the grid coordinates i.e "B4" -> (2,4)
+    int A = int('A');
+    int c = toupper(s[0]) +1 ; //make the letter uppercase ang get it's ascii code
+    c -= A;
+    int numbers = stoi(s.substr(1));
+    return make_tuple(c,numbers);
+}
 int main(){
     Boat b(5,2); //debugging start
     b.display();
@@ -168,7 +198,6 @@ int main(){
     b.coordinates[0][2]=1;
     b.placed=1;
     b.display();
-    cout << endl;
 
 
     Board bo;
