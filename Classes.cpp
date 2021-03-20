@@ -2,8 +2,9 @@
 #include <string>
 #include <list>
 #include <tuple>
+#include <iterator>
 using namespace std;
-string s = "▢⛝◼⛞⛋⬜⧉⬚⟎◳◻⛶□⧠⧈⧇";
+string s = "▢⛝◼⛞⛋⊡⬜⧉⬚⟎◳◻⛶□⧠⧈⧇⦰⦱⦲⦳⦴⦵⦶⦷⦸⦹⦺⦻⦼⦽⦾⦿⧀⧁⧂⧃";
 class Boat {
     public:
     int length;
@@ -18,11 +19,9 @@ class Boat {
         length = l;
         width = w;
         state = "unhit";
-        rotation = 0;
+        rotation = 0; //0 means the rotation is horizontal
         placed = 0;
-    }
-    void RotateBoat(){
-        rotation = !rotation;
+        HitCells = 0;
     }
     void Update(int x,int y){ //update the boat after a hit in (x,y) coordinates
         for (int i=0 ; i<length*width ; i++){
@@ -42,7 +41,7 @@ class Boat {
         if (!placed){
             for (int i=0 ; i<width ; i++){
                 for (int j=0 ; j<length ; j++){
-                    cout << "⛋" << " ";
+                    cout << "⦿" << " ";
                 }
                 cout << endl;
             }
@@ -50,10 +49,10 @@ class Boat {
         else {
             for (int i=0 ; i<width ; i++){
                 for (int j=0 ; j<length ; j++){
-                    string s = "⛋";
+                    string s = "⦿";
                     for (int k=0 ; k<width*length ; k++){
                         if (coordinates[k][0] == i && coordinates[k][1] == j){
-                            s = "⛝";
+                            s = "⦻";
                         }
                     }
                     cout << s << " ";
@@ -68,7 +67,7 @@ class Board {
     public:
     int NbrBoats;
     list<Boat> BoatList;
-    int grid [8][8][2]; // grid the represents the board (x,y,(includeboat,hit))
+    int grid [8][8][2]; // grid the represents the board (x,y,(includeboat,hit)) default grid is 8x8
     public:
     Board(){
         for (int i=0 ; i<8 ; i++){
@@ -78,25 +77,91 @@ class Board {
             }
         }   
     }
-    void Strike (int x,int y){ //assumes (x,y) are valid coordinates to strike
+    void Strike (int x, int y){ //assumes (x,y) are valid coordinates to strike
         grid[x][y][2] = 1;
         for (auto iter = BoatList.begin() ; iter != BoatList.end() ; iter++){ //iterate over the BoatList and update the boats one by one
             iter->Update(x,y);
         }
     }
+    int VerifyBoatPlacement(int x, int y, Boat b){ //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
+        if (b.rotation == 0){ // the boat is horizontal in its rotation
+            if (x+b.width>8){ 
+                return 0;
+            }
+            if (y+b.length>8){
+                return 0;
+            }
+            for (int i=x ; i<x+b.width ; i++){ //verify the boat is not colliding with any other boat
+                for (int j=y ; j<y+b.length ; j++){
+                    if (grid[i][j][0] == 1){
+                        return 0;
+                    }
+                }
+            }
+        }
+        if (b.rotation == 1){ // the boat is vertical in its rotation
+            if (x+b.length>8){
+                return 0;
+            }
+            if (y+b.width>8){
+                return 0;
+            }
+            for (int i=x ; i<x+b.length ; i++){ //verify the boat is not colliding with any other boat
+                for (int j=y ; j<y+b.width ; j++){
+                    if (grid[i][j][0] == 1){
+                        return 0;
+                    }
+                }
+            }
+        }
+        return 1;
+    }
+    void PlaceBoat(int x, int y, Boat b){ //takes a boat and places it where (x,y) are the top left coordinates and add it to the list of placed boats
+        if (b.rotation ==0 ){ //the boat is horizontal
+            for (int i=x ; i<x+b.width ; i++){
+                for (int j=y ; j<y+b.length ; j++){
+                    grid[i][j][0] == 1;
+                    int k = 0;
+                    b.coordinates[k][0] = i ; // add (i,j) coordinates to the boat and initialize it to not hit
+                    b.coordinates[k][1] = j ;
+                    b.coordinates[k][0] = 0 ;
+                }
+            }
+        }
+        if (b.rotation ==0 ){ //the boat is vertical
+            for (int i=x ; i<x+b.length ; i++){
+                for (int j=y ; j<y+b.width ; j++){
+                    grid[i][j][0] == 1;
+                    int k = 0;
+                    b.coordinates[k][0] = i ; // add (i,j) coordinates to the boat and initialize it to not hit
+                    b.coordinates[k][1] = j ;
+                    b.coordinates[k][0] = 0 ;
+                }
+            }
+        }
+        BoatList.push_back(b);
+    }
     void display(){
+        cout << "  ";
+        char letter = 'A';
+        for (int k=0 ; k<8 ; k++){
+            cout << k+1 << "  ";
+        }
+        cout << endl;
         for (int i=0 ; i<8 ; i++){
+            cout << char(letter) << " ";
+            letter = char(letter+1);
                 for (int j=0 ; j<8 ; j++){
-                    string s = "⧉";
+                    string s = "〇";            //represents unhit cell that doesn't contain a bot
                     if (grid[i][j][0]==1){
-                        s = "⛋";
+                        s = "⦿";               //represnets unhit cell that contains a boat
                         if (grid[i][j][1]==1){
-                            s="⛝";
+                            s="⦻";             //represnets hit cell that contains a boat
                         }
                     }
                     else{
                         if (grid[i][j][1]==1){
-                            s= "⛞";
+                            s= "⦰";            //represnets hit cell that doesn't contain a bot
                         }
                     }
                     cout << s << " ";
@@ -105,14 +170,22 @@ class Board {
             }
     }
     void OpponentDisplay(){
+        cout << "  ";
+        char letter = 'A';
+        for (int k=0 ; k<8 ; k++){
+            cout << k+1 << "  ";
+        }
+        cout << endl;
         for (int i=0 ; i<8 ; i++){
+            cout << char(letter) << " ";
+            letter = char(letter+1);
                 for (int j=0 ; j<8 ; j++){
-                    string s = "⧉";   //cell is empty by default
+                    string s = "〇";   //cell is empty by default
                     if (grid[i][j][1]==1){ //cell is hit
                         if (grid[i][j][0]==0){ //if the cell doesn't contain a bot
-                            s = "⛞";
+                            s = "⦰";
                         }else { // if the cell contains a boat
-                            s = "⛝";
+                            s = "⦻";
                         }
                     }
                     cout << s << " ";
@@ -137,11 +210,30 @@ class Player{
         inventory.push_back(b);
     }
     void ShowInventory(){
+        int index = 1;
         for (auto iter = inventory.begin() ; iter != inventory.end() ; iter++){ //iterate over the boats in the inventory
             iter->display();
+            cout << "Boat number " << index << endl;
+            index ++;
         }
     }
-    void loser(){
+    void SelectBoat(int index, int rotation){ //takes the chosen boat and put it in the front of the list in the inventory (and rotate it if needed)
+        auto iter = inventory.begin();
+        for (int i = 0 ; i< index-1 ; i++){
+        iter++;
+        }
+        inventory.erase(iter);
+        if (rotation == 1){
+            iter->rotation = 1; //rotate the boat
+        }
+        inventory.push_front(*iter);
+        }
+    void PlaceBoatFromInventory(int x, int y){
+        Boat b = inventory.front();
+        inventory.pop_front();
+        YourBoard.PlaceBoat(x,y,b);
+    }
+    void loser(){ //check if all the boats a player have on board are dead
         int DeadBoats = 0;
         for (auto iter = YourBoard.BoatList.begin() ; iter != YourBoard.BoatList.end() ; iter++){ //iterate over the boats in the inventory
             if (iter->state == "dead"){
@@ -171,7 +263,7 @@ int VerifyInput(string s,int length,int width){ //verify the player's input is i
     if (s.length() != (width / 10) +2){ //verify the length of the input
         return 0;
     }
-    if (!(s1.find_first_not_of( "0123456789" ) == string::npos)){ //verify the rest of the string is numbers
+    if (!(s1.find_first_not_of( "0123456789" ) == string::npos)){ //verify the rest of the string is numbers //or you can use /*if (!(s1.find_first_not_of( "0123456789" ) == -1))*/ because s.find_first_not_of(s1) returns -1 if s only contain chars from s1
         return 0;
     }
     if (!(numbers>0 && numbers<=width)){ //verify the numbers are within the appropriate range
