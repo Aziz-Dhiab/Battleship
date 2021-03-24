@@ -46,49 +46,72 @@ class Boat {
                 cout << endl;
             }
         }
-        else {
-            for (int i=0 ; i<width ; i++){
-                for (int j=0 ; j<length ; j++){
-                    string s = "⦿";
-                    for (int k=0 ; k<width*length ; k++){
-                        if (coordinates[k][0] == i && coordinates[k][1] == j){
-                            s = "⦻";
+        else
+        { //(coordinates[0][0],coordinates[0][1]) are the top left coordinates of a placed boat
+            int x = coordinates[0][0];
+            int y = coordinates[0][1];
+            if (rotation == 0){
+                for (int i = x; i<x+width; i++){
+                    for (int j = y; j<y+length; j++){
+                        string s = "⦿";
+                        for (int k = 0; k < width*length; k++){
+                            if (coordinates[k][0] == i && coordinates[k][1] == j && coordinates[k][2] == 1){
+                                s = "⦻";
+                            }
                         }
+                        cout << s << " ";
                     }
-                    cout << s << " ";
+                    cout << endl;
                 }
-                cout << endl;
+                cout << state << endl;
+            }else{  //to test if the boat is vertical
+                for (int j = y; j<y+width; j++){      //or swap the 2 loops if you want to display the boats as vertical
+                    for (int i = x; i<x+length; i++){ //
+                        string s = "⦿";
+                        for (int k = 0; k < width * length; k++){
+                            if (coordinates[k][0] == i && coordinates[k][1] == j && coordinates[k][2] == 1){
+                                s = "⦻";
+                            }
+                        }
+                        cout << s << " ";
+                    }
+                    cout << endl;
+                }
+                cout << state << endl;
             }
-            cout << state << endl;
         }
     }
 };
 class Board {
     public:
+    int MaxLength;
+    int MaxWidth;
     int NbrBoats;
     list<Boat> BoatList;
-    int grid [8][8][2]; // grid the represents the board (x,y,(includeboat,hit)) default grid is 8x8
+    int grid [20][20][2]; // grid the represents the board (x,y,(includeboat,hit)) default grid is 8x8
     public:
-    Board(){
-        for (int i=0 ; i<8 ; i++){
-            for (int j=0 ; j<8 ; j++){
+    Board(int l=8,int w=8){
+        MaxLength = l;
+        MaxWidth = w;
+        for (int i=0 ; i<MaxLength ; i++){
+            for (int j=0 ; j<MaxWidth ; j++){
                 grid[i][j][0] = 0;
                 grid[i][j][1] = 0;
             }
         }   
     }
     void Strike (int x, int y){ //assumes (x,y) are valid coordinates to strike
-        grid[x][y][2] = 1;
+        grid[x][y][1] = 1;
         for (auto iter = BoatList.begin() ; iter != BoatList.end() ; iter++){ //iterate over the BoatList and update the boats one by one
             iter->Update(x,y);
         }
     }
     int VerifyBoatPlacement(int x, int y, Boat b){ //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
         if (b.rotation == 0){ // the boat is horizontal in its rotation
-            if (x+b.width>8){ 
+            if (x+b.width>MaxLength){ 
                 return 0;
             }
-            if (y+b.length>8){
+            if (y+b.length>MaxWidth){
                 return 0;
             }
             for (int i=x ; i<x+b.width ; i++){ //verify the boat is not colliding with any other boat
@@ -100,10 +123,10 @@ class Board {
             }
         }
         if (b.rotation == 1){ // the boat is vertical in its rotation
-            if (x+b.length>8){
+            if (x+b.length>MaxWidth){
                 return 0;
             }
-            if (y+b.width>8){
+            if (y+b.width>MaxLength){
                 return 0;
             }
             for (int i=x ; i<x+b.length ; i++){ //verify the boat is not colliding with any other boat
@@ -117,25 +140,27 @@ class Board {
         return 1;
     }
     void PlaceBoat(int x, int y, Boat b){ //takes a boat and places it where (x,y) are the top left coordinates and add it to the list of placed boats
-        if (b.rotation ==0 ){ //the boat is horizontal
+        b.placed = 1;
+        if (b.rotation == 0 ){ //the boat is horizontal
+            int k = 0;
             for (int i=x ; i<x+b.width ; i++){
                 for (int j=y ; j<y+b.length ; j++){
-                    grid[i][j][0] == 1;
-                    int k = 0;
+                    grid[i][j][0] = 1;
                     b.coordinates[k][0] = i ; // add (i,j) coordinates to the boat and initialize it to not hit
-                    b.coordinates[k][1] = j ;
-                    b.coordinates[k][0] = 0 ;
+                    b.coordinates[k][1] = j ; //
+                    b.coordinates[k][2] = 0 ; //
+                    k++;
                 }
             }
-        }
-        if (b.rotation ==0 ){ //the boat is vertical
+        }else{ //the boat is vertical
+            int k = 0;
             for (int i=x ; i<x+b.length ; i++){
                 for (int j=y ; j<y+b.width ; j++){
-                    grid[i][j][0] == 1;
-                    int k = 0;
+                    grid[i][j][0] = 1;
                     b.coordinates[k][0] = i ; // add (i,j) coordinates to the boat and initialize it to not hit
-                    b.coordinates[k][1] = j ;
-                    b.coordinates[k][0] = 0 ;
+                    b.coordinates[k][1] = j ; //
+                    b.coordinates[k][2] = 0 ; //
+                    k++;
                 }
             }
         }
@@ -144,14 +169,14 @@ class Board {
     void display(){
         cout << "  ";
         char letter = 'A';
-        for (int k=0 ; k<8 ; k++){
+        for (int k=0 ; k<MaxWidth ; k++){
             cout << k+1 << "  ";
         }
         cout << endl;
-        for (int i=0 ; i<8 ; i++){
+        for (int i=0 ; i<MaxLength ; i++){
             cout << char(letter) << " ";
             letter = char(letter+1);
-                for (int j=0 ; j<8 ; j++){
+                for (int j=0 ; j<MaxWidth ; j++){
                     string s = "〇";            //represents unhit cell that doesn't contain a bot
                     if (grid[i][j][0]==1){
                         s = "⦿";               //represnets unhit cell that contains a boat
@@ -172,14 +197,14 @@ class Board {
     void OpponentDisplay(){
         cout << "  ";
         char letter = 'A';
-        for (int k=0 ; k<8 ; k++){
+        for (int k=0 ; k<MaxWidth ; k++){
             cout << k+1 << "  ";
         }
         cout << endl;
-        for (int i=0 ; i<8 ; i++){
+        for (int i=0 ; i<MaxLength ; i++){
             cout << char(letter) << " ";
             letter = char(letter+1);
-                for (int j=0 ; j<8 ; j++){
+                for (int j=0 ; j<MaxLength ; j++){
                     string s = "〇";   //cell is empty by default
                     if (grid[i][j][1]==1){ //cell is hit
                         if (grid[i][j][0]==0){ //if the cell doesn't contain a bot
@@ -206,6 +231,37 @@ class Player{
         turn = 0;
         defeat = 0;
     }
+    Player(string s){ //parametrised constructor that adds the default boats to the player (both classic and belgium)
+        turn = 0;
+        defeat = 0;
+        if (s == "classic"){ //one length 5 bot, one length 4 boat, two length 3 boats, one length 2 boat
+            Boat b(5);
+            this->AddBoat(b);
+            b = Boat(4);
+            this->AddBoat(b);
+            b = Boat(3);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            b = Boat(2);
+            this->AddBoat(b);
+        }else if (s == "belgium"){ //one length 4 boat, two length 3 boats, three length 2 boats, four length 1 boats
+            Boat b(4);
+            this->AddBoat(b);
+            b = Boat(3);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            b = Boat(2);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            b = Boat(1);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            this->AddBoat(b);
+            this->AddBoat(b);
+        }
+
+    }
     void AddBoat(Boat b){
         inventory.push_back(b);
     }
@@ -217,17 +273,18 @@ class Player{
             index ++;
         }
     }
-    void SelectBoat(int index, int rotation){ //takes the chosen boat and put it in the front of the list in the inventory (and rotate it if needed)
+    void SelectBoat(int index, int rot=0){ //takes the chosen boat and put it in the front of the list in the inventory (and rotate it if needed)
         auto iter = inventory.begin();
         for (int i = 0 ; i< index-1 ; i++){
         iter++;
         }
+        Boat b = *iter;
         inventory.erase(iter);
-        if (rotation == 1){
-            iter->rotation = 1; //rotate the boat
+        if (rot == 1){
+            b.rotation = 1;
         }
-        inventory.push_front(*iter);
-        }
+        inventory.push_front(b);
+        } 
     void PlaceBoatFromInventory(int x, int y){
         Boat b = inventory.front();
         inventory.pop_front();
@@ -245,7 +302,7 @@ class Player{
         }
     }
     void display(){ //show a player's placed boats and their state and the player's and opponent's boards
-        for (auto iter = YourBoard.BoatList.begin() ; iter != YourBoard.BoatList.end() ; iter++){ //iterate over the boats in the inventory
+        for (auto iter = YourBoard.BoatList.begin() ; iter != YourBoard.BoatList.end() ; iter++){ //iterate over the boats in player's board list
             iter->display();
         }
         OpponentBoard.OpponentDisplay();
@@ -274,37 +331,32 @@ int VerifyInput(string s,int length,int width){ //verify the player's input is i
     }
     return 1;
 }
-tuple <int,int> TransformInput(string s){ // transform the input into the grid coordinates i.e "B4" -> (2,4)
+tuple <int,int> TransformInput(string s){ // transform the input into the grid coordinates i.e "B4" -> (1,3)
     int A = int('A');
     int c = toupper(s[0]) +1 ; //make the letter uppercase ang get it's ascii code
     c -= A;
     int numbers = stoi(s.substr(1));
-    return make_tuple(c,numbers);
+    return make_tuple(c-1,numbers-1);
 }
 int main(){
-    Boat b(5,2); //debugging start
-    b.display();
-
-    b.coordinates[0][0]=0;
-    b.coordinates[0][1]=0;
-    b.coordinates[0][2]=1;
-    b.placed=1;
-    b.display();
+    //debugging start
 
 
-    Board bo;
-    bo.grid[0][0][0]=0;
-    bo.grid[0][0][1]=0;
+    Player p1("classic");
+    p1.PlaceBoatFromInventory(0,0);
+    p1.PlaceBoatFromInventory(2,0);
+    p1.PlaceBoatFromInventory(4,0);
+    p1.PlaceBoatFromInventory(4,4);
+    p1.SelectBoat(1,1); // rotate boat
+    p1.PlaceBoatFromInventory(6,0);
+    p1.YourBoard.Strike(0,0);
+    p1.YourBoard.Strike(1,0);
+    p1.YourBoard.Strike(6,0);
+    p1.YourBoard.Strike(7,0);
+    p1.ShowInventory(); // it's empty
+    p1.display(); //showing your boats then opponent board then your board
+    
 
-    bo.grid[0][1][0]=1;
-    bo.grid[0][1][1]=0;
-
-    bo.grid[1][0][0]=0;
-    bo.grid[1][0][1]=1;
-
-    bo.grid[1][1][0]=1;
-    bo.grid[1][1][1]=1;
-
-    bo.display(); //debugging end
+    //debugging end
     return 0;
 }
