@@ -5,6 +5,7 @@
 #include <iterator>
 using namespace std;
 string s = "▢⛝◼⛞⛋⊡⬜⧉⬚⟎◳◻⛶□⧠⧈⧇⦰⦱⦲⦳⦴⦵⦶⦷⦸⦹⦺⦻⦼⦽⦾⦿⧀⧁⧂⧃";
+// represents a boat and its size and its state if it's placed
 class Boat{
     public:
     int length;
@@ -23,7 +24,8 @@ class Boat{
         placed = 0;
         HitCells = 0;
     }
-    void Update(int x, int y){ //update the boat after a hit in (x,y) coordinates
+    //update the boat after a hit in (x,y) coordinates
+    void Update(int x, int y){
         for (int i = 0; i < length * width; i++){
             if (coordinates[i][0] == x && coordinates[i][1] == y){
                 coordinates[i][2] = 1;
@@ -81,6 +83,7 @@ class Boat{
         }
     }
 };
+// represents a board with the boats in it (can represents both a player's or an opponent's board)
 class Board{
     public:
     int MaxLength;
@@ -99,13 +102,15 @@ class Board{
             }
         }
     }
-    void Strike(int x, int y){ //assumes (x,y) are valid coordinates to strike
+    //assumes (x,y) are valid coordinates to strike
+    void Strike(int x, int y){
         grid[x][y][1] = 1;
         for (auto iter = BoatList.begin(); iter != BoatList.end(); iter++){ //iterate over the BoatList and update the boats one by one
             iter->Update(x, y);
         }
     }
-    int VerifyBoatPlacement(int x, int y, Boat b){ //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
+    //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
+    int VerifyBoatPlacement(int x, int y, Boat b){
         if (b.rotation == 0){ // the boat is horizontal in its rotation
             if (x + b.width > MaxLength){
                 return 0;
@@ -138,7 +143,8 @@ class Board{
         }
         return 1;
     }
-    void PlaceBoat(int x, int y, Boat b){ //takes a boat and places it where (x,y) are the top left coordinates and add it to the list of placed boats
+    //takes a boat and places it where (x,y) are the top left coordinates and add it to the list of placed boats
+    void PlaceBoat(int x, int y, Boat b){
         b.placed = 1;
         if (b.rotation == 0){ //the boat is horizontal
             int k = 0;
@@ -198,7 +204,7 @@ class Board{
                 cout << "║" << s << " ";
             }
             cout << "║" << endl;
-            if (i < MaxLength - 1){
+            if (i < MaxLength - 1){   //condition so you don't draw an extra line
                 cout << "  ╠";
                 for (int l = 0; l < MaxWidth - 1; l++){
                     cout << "══╬";
@@ -242,7 +248,7 @@ class Board{
                 cout << "║" << s << " ";
             }
             cout << "║" << endl;
-            if (i < MaxLength - 1){
+            if (i < MaxLength - 1){ //condition so you don't draw an extra line
                 cout << "  ╠";
                 for (int l = 0; l < MaxWidth - 1; l++){
                     cout << "══╬";
@@ -258,6 +264,7 @@ class Board{
         cout << "══╝" << endl;
     }
 };
+// represents one of two players in a given game
 class Player{
     public:
     int turn;
@@ -271,7 +278,8 @@ class Player{
         turn = 0;
         defeat = 0;
     }
-    Player(string s){ //parametrised constructor that adds the default boats to the player (both classic and belgium)
+    //parametrised constructor that adds the default boats to the player (both classic and belgium)
+    Player(string s){
         turn = 0;
         defeat = 0;
         if (s == "classic"){ //one length 5 bot, one length 4 boat, two length 3 boats, one length 2 boat
@@ -317,7 +325,8 @@ class Player{
             index++;
         }
     }
-    void SelectBoat(int index, int rot = 0){ //takes the chosen boat and put it in the front of the list in the inventory (and rotate it if needed)
+    //takes the chosen boat and put it in the front of the list in the inventory (and rotate it if needed)
+    void SelectBoat(int index, int rot = 0){
         auto iter = inventory.begin();
         for (int i = 0; i < index - 1; i++){
             iter++;
@@ -333,7 +342,8 @@ class Player{
         inventory.pop_front();
         YourBoard.PlaceBoat(x, y, b);
     }
-    void loser(){ //check if all the boats a player have on board are dead
+    //check if all the boats a player have on board are dead
+    void loser(){
         int DeadBoats = 0;
         for (auto iter = YourBoard.BoatList.begin(); iter != YourBoard.BoatList.end(); iter++){ //iterate over the boats in the inventory
             if (iter->state == "dead"){
@@ -344,7 +354,8 @@ class Player{
             }
         }
     }
-    void display(){ //show a player's placed boats and their state and the player's and opponent's boards
+    //show a player's placed boats and their state and the player's and opponent's boards
+    void display(){
         cout << "-------------- Your Boats ---------------" << endl;
         for (auto iter = YourBoard.BoatList.begin(); iter != YourBoard.BoatList.end(); iter++){ //iterate over the boats in player's board list
             iter->display();
@@ -355,7 +366,8 @@ class Player{
         OpponentBoard.OpponentDisplay();
     }
 };
-int VerifyInput(string s, int length, int width){ //verify the player's input is in the right form i.e E5 , B7
+// verify the player's input is in the right form i.e E5 , B7 
+int VerifyInput(string s, int length, int width){
     int a = int('a');
     int A = int('A');
     char c = s[0];
@@ -376,7 +388,8 @@ int VerifyInput(string s, int length, int width){ //verify the player's input is
     }
     return 1;
 }
-tuple<int, int> TransformInput(string s){ // transform the input into the grid coordinates i.e "B4" -> (1,3)
+// transform the input into the grid coordinates i.e "B4" -> (1,3)
+tuple<int, int> TransformInput(string s){ // 
     int A = int('A');
     int c = toupper(s[0]) + 1; //make the letter uppercase ang get it's ascii code
     c -= A;
@@ -384,6 +397,7 @@ tuple<int, int> TransformInput(string s){ // transform the input into the grid c
     return make_tuple(c - 1, numbers - 1);
 }
 int debugging(){
+    int i = VerifyInput()
     printf("\033c"); //clears the console system("cls"); for windows shell
     Player p1("classic");
     string input ="A1";
