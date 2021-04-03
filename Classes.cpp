@@ -3,6 +3,7 @@
 #include <list>
 #include <tuple>
 #include <iterator>
+#include <windows.h>
 using namespace std;
 string s = "▢⛝◼⛞⛋⊡⬜⧉⬚⟎◳◻⛶□⧠⧈⧇⦰⦱⦲⦳⦴⦵⦶⦷⦸⦹⦺⦻⦼⦽⦾⦿⧀⧁⧂⧃";
 // represents a boat and its size and its state if it's placed
@@ -41,17 +42,27 @@ class Boat{
     void display(){
         string s = "";
         if (!placed){
-            for (int i = 0; i < width; i++){
-                for (int j = 0; j < length; j++){
-                    cout << "◯"//"O" if on windows shell  //windows shell doesn't display UTF-8/unicode characters
-                         << " ";
+            if(rotation == 0){
+                for (int i = 0; i < width; i++){
+                    for (int j = 0; j < length; j++){
+                        cout << "◯"//"O" if on windows shell  //windows shell doesn't display UTF-8/unicode characters
+                            << " ";
+                    }
+                    cout << endl;
                 }
-                cout << endl;
+            }else{
+                for (int j = 0; j < length; j++){
+                    for (int i = 0; i < width; i++){
+                        cout << "◯"//"O" if on windows shell  //windows shell doesn't display UTF-8/unicode characters
+                            << " ";
+                    }
+                    cout << endl;
+                }
             }
         }else{ //(coordinates[0][0],coordinates[0][1]) are the top left coordinates of a placed boat
             int x = coordinates[0][0];
             int y = coordinates[0][1];
-            if (rotation == 0){
+            if (rotation == 0){ 
                 for (int i = x; i < x + width; i++){
                     for (int j = y; j < y + length; j++){
                         string s = "◯";//"O" if on windows shell
@@ -173,18 +184,19 @@ class Board{
         BoatList.push_back(b);
     }
     void display(){
-        cout << "   "; //first line that contains numbers
         char letter = 'A';
+
+        cout << "    "; //first line that contains numbers
         for (int k = 0; k < MaxWidth; k++){
-            cout << k + 1 << "  ";
+            cout << k + 1 << "   ";
         }
         cout << endl;
 
         cout << "  ╔"; //top part of the grid
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << "══╦";
+            cout << "═══╦";
         }
-        cout << "══╗" << endl;
+        cout << "═══╗" << endl;
 
         for (int i = 0; i < MaxLength; i++){
             cout << char(letter) << " ";
@@ -201,37 +213,37 @@ class Board{
                         s = "Χ";                                  //represnets hit cell that doesn't contain a bot
                     }
                 }
-                cout << "║" << s << " ";
+                cout << "║ " << s << " ";
             }
-            cout << "║" << endl;
+            cout << "║ " << endl;
             if (i < MaxLength - 1){   //condition so you don't draw an extra line
                 cout << "  ╠";
                 for (int l = 0; l < MaxWidth - 1; l++){
-                    cout << "══╬";
+                    cout << "═══╬";
                 }
-                cout << "══╣" << endl;
+                cout << "═══╣" << endl;
             }
         }
 
         cout << "  ╚"; //bottom part of the grid
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << "══╩";
+            cout << "═══╩";
         }
-        cout << "══╝" << endl;
+        cout << "═══╝" << endl;
     }
     void OpponentDisplay(){
-        cout << "   "; //first line that contains numbers
+        cout << "    "; //first line that contains numbers
         char letter = 'A';
         for (int k = 0; k < MaxWidth; k++){
-            cout << k + 1 << "  ";
+            cout << k + 1 << "   ";
         }
         cout << endl;
 
         cout << "  ╔"; //top part of the grid
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << "══╦";
+            cout << "═══╦";
         }
-        cout << "══╗" << endl;
+        cout << "═══╗" << endl;
 
         for (int i = 0; i < MaxLength; i++){
             cout << char(letter) << " ";
@@ -245,23 +257,23 @@ class Board{
                         s = "⭙";//"Ø" if on windows shell
                     }
                 }
-                cout << "║" << s << " ";
+                cout << "║ " << s << " ";
             }
-            cout << "║" << endl;
+            cout << "║ " << endl;
             if (i < MaxLength - 1){ //condition so you don't draw an extra line
                 cout << "  ╠";
                 for (int l = 0; l < MaxWidth - 1; l++){
-                    cout << "══╬";
+                    cout << "═══╬";
                 }
-                cout << "══╣" << endl;
+                cout << "═══╣" << endl;
             }
         }
 
         cout << "  ╚"; //bottom part of the grid
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << "══╩";
+            cout << "═══╩";
         }
-        cout << "══╝" << endl;
+        cout << "═══╝" << endl;
     }
 };
 // represents one of two players in a given game
@@ -269,48 +281,61 @@ class Player{
     public:
     int turn;
     int defeat;
+    int MaxLength;
+    int MaxWidth;
+    int NbrOfBoatsInInventory;
     list<Boat> inventory;
     Board YourBoard;
     Board OpponentBoard;
 
     public:
+    void SetMaxLength(int i){
+        MaxWidth = i;
+    }
+    void SetMaxWidth(int i){
+        MaxWidth = i;
+    }
     Player(){
         turn = 0;
         defeat = 0;
+        NbrOfBoatsInInventory = 0;
     }
     //parametrised constructor that adds the default boats to the player (both classic and belgium)
     Player(string s){
         turn = 0;
         defeat = 0;
+        MaxLength = 8;
+        MaxWidth = 8;
         if (s == "classic"){ //one length 5 bot, one length 4 boat, two length 3 boats, one length 2 boat
             Boat b(5);
-            this->AddBoat(b);
+            AddBoat(b);
             b = Boat(4);
-            this->AddBoat(b);
+            AddBoat(b);
             b = Boat(3);
-            this->AddBoat(b);
-            this->AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
             b = Boat(2);
-            this->AddBoat(b);
+            AddBoat(b);
         }else if (s == "belgium"){ //one length 4 boat, two length 3 boats, three length 2 boats, four length 1 boats
             Boat b(4);
-            this->AddBoat(b);
+            AddBoat(b);
             b = Boat(3);
-            this->AddBoat(b);
-            this->AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
             b = Boat(2);
-            this->AddBoat(b);
-            this->AddBoat(b);
-            this->AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
             b = Boat(1);
-            this->AddBoat(b);
-            this->AddBoat(b);
-            this->AddBoat(b);
-            this->AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
+            AddBoat(b);
         }
     }
     void AddBoat(Boat b){
         inventory.push_back(b);
+        NbrOfBoatsInInventory ++;
     }
     int InventoryIsEmpty(){
         return inventory.empty();
@@ -337,10 +362,95 @@ class Player{
         }
         inventory.push_front(*iter);
     }
+    void ShowSelectedBoat(){
+        inventory.front().display();
+    }
+    // verify the player's input is in the right form i.e E5 , B7 
+    int VerifyInput(string s){
+        int a = int('a');
+        int A = int('A');
+        char c = s[0];
+        int letter = int(c);
+        if (s.length() != (MaxWidth / 10) + 2){ //verify the length of the input (its determined by the width of the board)
+            return 0;
+        }
+        string s1 = s.substr(1);
+        if (!(s1.find_first_not_of("0123456789") == -1)){ //verify the rest of the string is numbers // s.find_first_not_of(s1) returns -1 if s only contain chars from s1
+            return 0;
+        }
+        int numbers = stoi(s1);
+        if (!(numbers > 0 && numbers <= MaxWidth)){ //verify the numbers are within the appropriate range
+            return 0;
+        }
+        if (!((letter >= a && letter < a + MaxLength) || (letter >= A && letter < A + MaxLength))){ // verify the letter is within the range of letters i.e [a..g]
+            return 0;
+        }
+        return 1;
+    }
+    // transform the input into the grid coordinates i.e "B4" -> (1,3)
+    tuple<int, int> TransformInput(string s){ // 
+        int A = int('A');
+        int c = toupper(s[0]) + 1; //make the letter uppercase ang get it's ascii code
+        c -= A;
+        int numbers = stoi(s.substr(1));
+        return make_tuple(c - 1, numbers - 1);
+    }
+    //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
+    int VerifySelectedBoatPlacement(int x, int y){
+        Boat b = inventory.front();
+        return YourBoard.VerifyBoatPlacement(x,y,b);
+    }
     void PlaceBoatFromInventory(int x, int y){
         Boat b = inventory.front();
         inventory.pop_front();
         YourBoard.PlaceBoat(x, y, b);
+        NbrOfBoatsInInventory --;
+    }
+    void PlaceTheBoats(){
+        string s;
+        int i;
+        tuple<int, int> t;
+        while (!InventoryIsEmpty()){
+        DisplayBoard();
+        ShowInventory();
+        cout << endl << "Enter the number of the boat to place" << endl;
+        while (1){
+            cin >> s;
+            if ((s.find_first_not_of("0123456789") == -1)){ //the input is a number
+                i = stoi(s);
+                if (i>=1 && i<=NbrOfBoatsInInventory){
+                    break;
+                }
+            }
+            cout << "Not a valid number, please try again" << endl;
+        }
+        cout << "Do you want to rotate the boat ? enter 1 for yes and 0 for no" << endl;
+        do {
+            cin >> s;
+            if (s != "0" && s != "1"){
+                cout << "Not a valid input, please try again" << endl;
+            }
+        }while (s != "0" && s != "1");
+        SelectBoat(i,stoi(s));
+        printf("\033c");
+        DisplayBoard();
+        cout << "This is your selected Boat" << endl << endl;
+        ShowSelectedBoat();
+        cout << endl << "Please enter the coordinates of the top-left corner of the boat" << endl;
+        while (1){
+            cin >> s;
+            if (VerifyInput(s)){ //the input is in the right form
+                t = TransformInput(s);
+                if (VerifySelectedBoatPlacement(get<0>(t),get<1>(t))){
+                    break;
+                }
+            }
+            cout << "Invalid coordinates, please try again" << endl;
+        }
+        PlaceBoatFromInventory(get<0>(t),get<1>(t));
+        printf("\033c");
+    }
+    DisplayBoard();
     }
     //check if all the boats a player have on board are dead
     void loser(){
@@ -365,58 +475,65 @@ class Player{
         cout << "---------- Your Opponent's Board ---------" << endl;
         OpponentBoard.OpponentDisplay();
     }
+    void DisplayBoard(){
+        cout << "--------------- Your Board ---------------" << endl;
+        YourBoard.display();
+    }
 };
-// verify the player's input is in the right form i.e E5 , B7 
-int VerifyInput(string s, int length, int width){
-    int a = int('a');
-    int A = int('A');
-    char c = s[0];
-    int letter = int(c);
-    string s1 = s.substr(1);
-    int numbers = stoi(s1);
-    if (s.length() != (width / 10) + 2){ //verify the length of the input
-        return 0;
-    }
-    if (!(s1.find_first_not_of("0123456789") == string::npos)){ //verify the rest of the string is numbers //or you can use /*if (!(s1.find_first_not_of( "0123456789" ) == -1))*/ because s.find_first_not_of(s1) returns -1 if s only contain chars from s1
-        return 0;
-    }
-    if (!(numbers > 0 && numbers <= width)){ //verify the numbers are within the appropriate range
-        return 0;
-    }
-    if (!((letter >= a && letter < a + width) || (letter >= A && letter < A + width))){ // verify the letter is within the range of letters i.e [a..g]
-        return 0;
-    }
-    return 1;
-}
-// transform the input into the grid coordinates i.e "B4" -> (1,3)
-tuple<int, int> TransformInput(string s){ // 
-    int A = int('A');
-    int c = toupper(s[0]) + 1; //make the letter uppercase ang get it's ascii code
-    c -= A;
-    int numbers = stoi(s.substr(1));
-    return make_tuple(c - 1, numbers - 1);
-}
-int debugging(){
-    int i = VerifyInput()
-    printf("\033c"); //clears the console system("cls"); for windows shell
-    Player p1("classic");
-    string input ="A1";
-    tuple<int,int> t =TransformInput(input);
-    p1.PlaceBoatFromInventory(get<0>(t), get<1>(t));
-    p1.PlaceBoatFromInventory(2, 0);
-    p1.PlaceBoatFromInventory(4, 4);
-    p1.SelectBoat(1, 1); // rotate boat
-    p1.PlaceBoatFromInventory(5, 0);
-    p1.YourBoard.Strike(0, 0);
-    p1.YourBoard.Strike(1, 0);
-    p1.YourBoard.Strike(5, 0);
-    p1.YourBoard.Strike(6, 0);
-    p1.YourBoard.Strike(7, 0);
-    p1.ShowInventory();
-    p1.display();       //showing your boats then opponent board then your board
-    return 0;
-}
+
 int main(){
-    debugging();
+    //global variables used for input control
+    string s;
+    int i;
+    tuple<int, int> t;
+    //setting up and choosing mode
+    Player p1;
+    Player p2;
+    //Sleep(300);
+    cout << "--------- Welcome To Battleship ----------" << endl;
+    //Sleep(500); //selecting the play mode
+    cout << "To play classic mode please enter 1" << endl;
+    //Sleep(500);
+    cout << "To play Belgium mode please enter 2" << endl;
+    //Sleep(500);
+    do {
+        cin >> s;
+        if (s != "1" && s != "2"){
+            cout << "Not a valid input, please try again" << endl;
+        }
+    }while (s != "1" && s != "2");
+    if (s == "1"){
+        p1 = Player("classic");
+        p2 = Player("classic");
+    }else {
+        p1 = Player("belgium");
+        p2 = Player("belgium");
+    }
+    printf("\033c");
+    //Sleep(500);
+    cout << "It\'s the first player turn" << endl;
+    //Sleep(500);
+    cout << "Press any key to continue" << endl;
+    cin >> s;
+    //Sleep(500);
+    printf("\033c");
+    //Sleep(500);
+
+    p1.PlaceTheBoats();
+
+    cout << endl << endl << "First player\'s turn is finished" << endl;
+    cout << "Press any key to continue" << endl;
+    cin >> s;
+    printf("\033c");
+    cout << "It\'s the secound player turn" << endl;
+    cout << "Press any key to continue" << endl;
+    cin >> s;
+    printf("\033c");
+
+    p2.PlaceTheBoats();
+    
+
+
+    system("pause");
     return 0;
 }
