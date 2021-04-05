@@ -26,18 +26,23 @@ class Boat{
         HitCells = 0;
     }
     //update the boat after a hit in (x,y) coordinates
-    void Update(int x, int y){
-        for (int i = 0; i < length * width; i++){
-            if (coordinates[i][0] == x && coordinates[i][1] == y){
-                coordinates[i][2] = 1;
-                state = "hit";
-                HitCells++;
-                if (HitCells == length * width){
-                    state = "dead";
-                    return; // to break out of the function
+    string Update(int x, int y, string s){
+        if (s == ""){
+            for (int i = 0; i < length * width; i++){
+                if (coordinates[i][0] == x && coordinates[i][1] == y){
+                    coordinates[i][2] = 1;
+                    state = "hit";
+                    s = "Hit";
+                    HitCells++;
+                    if (HitCells == length * width){
+                        state = "dead";
+                        s = "Sunk";
+                        return s; // to break out of the function
+                    }
                 }
             }
         }
+        return s;
     }
     void display(){
         string s = "";
@@ -114,11 +119,16 @@ class Board{
         }
     }
     //assumes (x,y) are valid coordinates to strike
-    void Strike(int x, int y){
+    string Strike(int x, int y){
+        string s = "";
         grid[x][y][1] = 1;
         for (auto iter = BoatList.begin(); iter != BoatList.end(); iter++){ //iterate over the BoatList and update the boats one by one
-            iter->Update(x, y);
+            s = iter->Update(x, y, s);
         }
+        if (s == ""){
+            s = "Miss";
+        }
+        return s;
     }
     //verify you can place the boat in the (x,y) coordinates where (x,y) are the top left coordinates
     int VerifyBoatPlacement(int x, int y, Boat b){
@@ -279,11 +289,11 @@ class Board{
 // represents one of two players in a given game
 class Player{
     public:
-    int turn;
-    int defeat;
+    int Turn;
     int MaxLength;
     int MaxWidth;
     int NbrOfBoatsInInventory;
+    int BoatsAlive;
     list<Boat> inventory;
     Board YourBoard;
     Board OpponentBoard;
@@ -295,15 +305,16 @@ class Player{
     void SetMaxWidth(int i){
         MaxWidth = i;
     }
+    void BeginTurn(){
+        Turn = 1;
+    }
     Player(){
-        turn = 0;
-        defeat = 0;
+        Turn = 0;
         NbrOfBoatsInInventory = 0;
     }
     //parametrised constructor that adds the default boats to the player (both classic and belgium)
     Player(string s){
-        turn = 0;
-        defeat = 0;
+        Turn = 0;
         MaxLength = 8;
         MaxWidth = 8;
         if (s == "classic"){ //one length 5 bot, one length 4 boat, two length 3 boats, one length 2 boat
@@ -331,6 +342,9 @@ class Player{
             AddBoat(b);
             AddBoat(b);
             AddBoat(b);
+        }else if (s == "test"){
+            Boat b(2);
+            AddBoat (b);
         }
     }
     void AddBoat(Boat b){
@@ -390,7 +404,7 @@ class Player{
     // transform the input into the grid coordinates i.e "B4" -> (1,3)
     tuple<int, int> TransformInput(string s){ // 
         int A = int('A');
-        int c = toupper(s[0]) + 1; //make the letter uppercase ang get it's ascii code
+        int c = toupper(s[0]) + 1; //make the letter uppercase and get it's ascii code
         c -= A;
         int numbers = stoi(s.substr(1));
         return make_tuple(c - 1, numbers - 1);
@@ -405,64 +419,102 @@ class Player{
         inventory.pop_front();
         YourBoard.PlaceBoat(x, y, b);
         NbrOfBoatsInInventory --;
+        BoatsAlive ++;
     }
     void PlaceTheBoats(){
         string s;
         int i;
         tuple<int, int> t;
         while (!InventoryIsEmpty()){
-        DisplayBoard();
-        ShowInventory();
-        cout << endl << "Enter the number of the boat to place" << endl;
-        while (1){
-            cin >> s;
-            if ((s.find_first_not_of("0123456789") == -1)){ //the input is a number
-                i = stoi(s);
-                if (i>=1 && i<=NbrOfBoatsInInventory){
-                    break;
+            DisplayBoard();
+            ShowInventory();
+            cout << endl
+                 << "Enter the number of the boat to place" << endl;
+            while (1){
+                cin >> s;
+                if ((s.find_first_not_of("0123456789") == -1)){ //the input is a number
+                    i = stoi(s);
+                    if (i >= 1 && i <= NbrOfBoatsInInventory){
+                        break;
+                    }
                 }
+                cout << "Not a valid number, please try again" << endl;
             }
-            cout << "Not a valid number, please try again" << endl;
-        }
-        cout << "Do you want to rotate the boat ? enter 1 for yes and 0 for no" << endl;
-        do {
-            cin >> s;
-            if (s != "0" && s != "1"){
-                cout << "Not a valid input, please try again" << endl;
-            }
-        }while (s != "0" && s != "1");
-        SelectBoat(i,stoi(s));
-        printf("\033c");
-        DisplayBoard();
-        cout << "This is your selected Boat" << endl << endl;
-        ShowSelectedBoat();
-        cout << endl << "Please enter the coordinates of the top-left corner of the boat" << endl;
-        while (1){
-            cin >> s;
-            if (VerifyInput(s)){ //the input is in the right form
-                t = TransformInput(s);
-                if (VerifySelectedBoatPlacement(get<0>(t),get<1>(t))){
-                    break;
+            cout << "Do you want to rotate the boat ? enter 1 for yes and 0 for no" << endl;
+            do{
+                cin >> s;
+                if (s != "0" && s != "1"){
+                    cout << "Not a valid input, please try again" << endl;
                 }
+            }while (s != "0" && s != "1");
+            SelectBoat(i, stoi(s));
+            printf("\033c");
+            DisplayBoard();
+            cout << "This is your selected Boat" << endl
+                 << endl;
+            ShowSelectedBoat();
+            cout << endl
+                 << "Please enter the coordinates of the top-left corner of the boat" << endl;
+            while (1){
+                cin >> s;
+                if (VerifyInput(s)){ //the input is in the right form
+                    t = TransformInput(s);
+                    if (VerifySelectedBoatPlacement(get<0>(t), get<1>(t))){
+                        break;
+                    }
+                }
+                cout << "Invalid coordinates, please try again" << endl;
             }
-            cout << "Invalid coordinates, please try again" << endl;
+            PlaceBoatFromInventory(get<0>(t), get<1>(t));
+            printf("\033c");
         }
-        PlaceBoatFromInventory(get<0>(t),get<1>(t));
-        printf("\033c");
+        DisplayBoard();
     }
-    DisplayBoard();
-    }
-    //check if all the boats a player have on board are dead
-    void loser(){
-        int DeadBoats = 0;
-        for (auto iter = YourBoard.BoatList.begin(); iter != YourBoard.BoatList.end(); iter++){ //iterate over the boats in the inventory
-            if (iter->state == "dead"){
-                DeadBoats++;
-            }
-            if (DeadBoats == YourBoard.BoatList.size()){
-                defeat = 1;
-            }
+    string Strike(int x, int y, Player &p){
+        string s;
+        s = OpponentBoard.Strike(x,y);
+        p.YourBoard.Strike(x,y);
+        if (s == "Miss"){
+            Turn = 0;
+        }else if (s == "Sunk"){
+            p.BoatsAlive --;
         }
+        return s;
+    }
+    int VerifyStrike(int x, int y){
+        return OpponentBoard.grid[x][y][1] == 0;
+    }
+    //initialize the opponent board for both players after boat placements
+    void Initialize(Player &p){
+        OpponentBoard = p.YourBoard;
+        p.OpponentBoard = YourBoard;
+    }
+    string PlayTurn(string Hits,Player &p){
+        string s;
+        tuple<int, int> t;
+        while (Turn == 1){
+            printf("\033c");
+            display();
+            cout << Hits;
+            cout << "Please enter the coordinates to strike" << endl;
+            while (1){
+                cin >> s;
+                s[0] = toupper(s[0]);
+                if (VerifyInput(s)){ //the input is in the right form
+                    t = TransformInput(s);
+                    if (VerifyStrike(get<0>(t), get<1>(t))){
+                        break;
+                    }
+                }
+                cout << "Invalid coordinates, please try again" << endl;
+            }
+            Hits = Hits + Strike(get<0>(t), get<1>(t), p) + " at " + s + "\n";
+            if (p.BoatsAlive == 0){break;}
+            printf("\033c");
+            display();
+            cout << Hits;
+        }
+        return Hits;
     }
     //show a player's placed boats and their state and the player's and opponent's boards
     void display(){
@@ -490,12 +542,11 @@ int main(){
     Player p1;
     Player p2;
     //Sleep(300);
+    printf("\033c");
     cout << "--------- Welcome To Battleship ----------" << endl;
-    //Sleep(500); //selecting the play mode
+    //selecting the play mode
     cout << "To play classic mode please enter 1" << endl;
-    //Sleep(500);
     cout << "To play Belgium mode please enter 2" << endl;
-    //Sleep(500);
     do {
         cin >> s;
         if (s != "1" && s != "2"){
@@ -509,19 +560,17 @@ int main(){
         p1 = Player("belgium");
         p2 = Player("belgium");
     }
+
     printf("\033c");
-    //Sleep(500);
     cout << "It\'s the first player turn" << endl;
-    //Sleep(500);
     cout << "Press any key to continue" << endl;
     cin >> s;
-    //Sleep(500);
     printf("\033c");
-    //Sleep(500);
 
     p1.PlaceTheBoats();
 
-    cout << endl << endl << "First player\'s turn is finished" << endl;
+
+    cout <<  endl << "First player\'s turn is finished" << endl;
     cout << "Press any key to continue" << endl;
     cin >> s;
     printf("\033c");
@@ -531,9 +580,64 @@ int main(){
     printf("\033c");
 
     p2.PlaceTheBoats();
-    
 
+    p1.Initialize(p2);
 
-    system("pause");
+    string Hits ="";
+    while (1){
+        p1.BeginTurn();
+        if (Hits != ""){
+            printf("\033c");
+            p1.display();
+            cout <<  "-------- Your Opponent's Strikes --------" << endl;
+            cout << Hits;
+            cout << "Press any key to continue" << endl;
+            cin >> s;
+            Hits = "";
+        }
+
+        Hits = p1.PlayTurn(Hits,p2);
+        if (p2.BoatsAlive == 0){break;}
+
+        cout << endl << "First player\'s turn is finished" << endl;
+        cout << "Press any key to continue" << endl;
+        cin >> s;
+        printf("\033c");
+        cout << "It\'s the secound player turn" << endl;
+        cout << "Press any key to continue" << endl;
+        cin >> s;
+        printf("\033c");
+
+        p2.BeginTurn();
+        if (Hits != ""){
+            printf("\033c");
+            p2.display();
+            cout <<  "-------- Your Opponent's Strikes --------" << endl;
+            cout << Hits;
+            cout << "Press any key to continue" << endl;
+            cin >> s;
+            Hits = "";
+        }
+        Hits = p2.PlayTurn(Hits,p1);
+        if (p1.BoatsAlive == 0){break;}
+
+        cout << endl << endl << "Secound player\'s turn is finished" << endl;
+        cout << "Press any key to continue" << endl;
+        cin >> s;
+        printf("\033c");
+        cout << "It\'s the First player turn" << endl;
+        cout << "Press any key to continue" << endl;
+        cin >> s;
+        printf("\033c");
+    }
+    printf("\033c");
+
+    if (p2.BoatsAlive == 0){
+        p1.display();
+        cout << "The first player wins" << endl;
+    }else{
+        p2.display();
+        cout << "The secound player wins" << endl;
+    }
     return 0;
 }
