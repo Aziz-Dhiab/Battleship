@@ -5,10 +5,11 @@
 #include <iterator>
 #include <windows.h>
 using namespace std;
-string s = "▢⛝◼⛞⛋⊡⬜⧉⬚⟎◳◻⛶□⧠⧈⧇⦰⦱⦲⦳⦴⦵⦶⦷⦸⦹⦺⦻⦼⦽⦾⦿⧀⧁⧂⧃";
 // represents a boat and its size and its state if it's placed
 class Boat{
-    public:
+    friend class Board;
+    friend class Player;
+    private:
     int length;
     int width;
     int coordinates[20][3]; //represents a boat coordinates when on the board (x,y,hit or not)
@@ -17,6 +18,7 @@ class Boat{
     int HitCells;
     int placed; //to know if the boat is placed yet or not
     public:
+    //Boat constructor, by default the width is 1
     Boat(int l, int w = 1){
         length = l;
         width = w;
@@ -25,7 +27,7 @@ class Boat{
         placed = 0;
         HitCells = 0;
     }
-    //update the boat after a hit in (x,y) coordinates
+    //update the boat after a hit in (x,y) coordinates and return the result of the hit if it landed on the boat
     string Update(int x, int y, string s){
         if (s == ""){
             for (int i = 0; i < length * width; i++){
@@ -37,13 +39,14 @@ class Boat{
                     if (HitCells == length * width){
                         state = "dead";
                         s = "Sunk";
-                        return s; // to break out of the function
+                        return s; // to break out of the method
                     }
                 }
             }
         }
         return s;
     }
+    //display the boat either before or after it's placed on the board
     void display(){
         string s = "";
         if (!placed){
@@ -101,13 +104,15 @@ class Boat{
 };
 // represents a board with the boats in it (can represents both a player's or an opponent's board)
 class Board{
-    public:
+    friend class Player;
+    private:
     int MaxLength;
     int MaxWidth;
     int NbrBoats;
     list<Boat> BoatList;
     int grid[20][20][2]; // grid the represents the board (x,y,(includeboat,hit)) default grid is 8x8
     public:
+    // Constructor with the default MaxLength and MaxWidth equals 8
     Board(int l = 8, int w = 8){
         MaxLength = l;
         MaxWidth = w;
@@ -118,7 +123,7 @@ class Board{
             }
         }
     }
-    //assumes (x,y) are valid coordinates to strike
+    //assumes (x,y) are valid coordinates to strike, update the board after a strike in the (x,y) coordinates
     string Strike(int x, int y){
         string s = "";
         grid[x][y][1] = 1;
@@ -193,6 +198,7 @@ class Board{
         }
         BoatList.push_back(b);
     }
+    //display a player's board with the boats in it and the hits
     void display(){
         char letter = 'A';
 
@@ -241,6 +247,7 @@ class Board{
         }
         cout << "═══╝" << endl;
     }
+    //display an opponent's board with only the hits and the damaged cells
     void OpponentDisplay(){
         cout << "    "; //first line that contains numbers
         char letter = 'A';
@@ -288,16 +295,15 @@ class Board{
 };
 // represents one of two players in a given game
 class Player{
-    public:
+    private:
     int Turn;
     int MaxLength;
     int MaxWidth;
     int NbrOfBoatsInInventory;
     int BoatsAlive;
-    list<Boat> inventory;
+    list<Boat> inventory; //represents the list of boat before they are placed on the board
     Board YourBoard;
     Board OpponentBoard;
-
     public:
     void SetMaxLength(int i){
         MaxWidth = i;
@@ -305,18 +311,26 @@ class Player{
     void SetMaxWidth(int i){
         MaxWidth = i;
     }
+    //special setter for the turn attribute that can only set it to 1
     void BeginTurn(){
         Turn = 1;
     }
+    int GetBoatsAlive() const {
+        return BoatsAlive;
+    }
+    //default constructor
     Player(){
         Turn = 0;
         NbrOfBoatsInInventory = 0;
+        BoatsAlive = 0;
     }
     //parametrised constructor that adds the default boats to the player (both classic and belgium)
     Player(string s){
         Turn = 0;
         MaxLength = 8;
         MaxWidth = 8;
+        NbrOfBoatsInInventory = 0;
+        BoatsAlive = 0;
         if (s == "classic"){ //one length 5 bot, one length 4 boat, two length 3 boats, one length 2 boat
             Boat b(5);
             AddBoat(b);
@@ -579,9 +593,16 @@ int main(){
     cin >> s;
     printf("\033c");
 
+
     p2.PlaceTheBoats();
 
     p1.Initialize(p2);
+
+    printf("\033c");
+    cout << "It\'s the first player turn" << endl;
+    cout << "Press any key to continue" << endl;
+    cin >> s;
+    printf("\033c");
 
     string Hits ="";
     while (1){
@@ -597,7 +618,7 @@ int main(){
         }
 
         Hits = p1.PlayTurn(Hits,p2);
-        if (p2.BoatsAlive == 0){break;}
+        if (p2.GetBoatsAlive() == 0){break;}
 
         cout << endl << "First player\'s turn is finished" << endl;
         cout << "Press any key to continue" << endl;
@@ -619,7 +640,7 @@ int main(){
             Hits = "";
         }
         Hits = p2.PlayTurn(Hits,p1);
-        if (p1.BoatsAlive == 0){break;}
+        if (p1.GetBoatsAlive() == 0){break;}
 
         cout << endl << endl << "Secound player\'s turn is finished" << endl;
         cout << "Press any key to continue" << endl;
@@ -632,7 +653,7 @@ int main(){
     }
     printf("\033c");
 
-    if (p2.BoatsAlive == 0){
+    if (p2.GetBoatsAlive() == 0){
         p1.display();
         cout << "The first player wins" << endl;
     }else{
