@@ -435,6 +435,7 @@ class Player{
         NbrOfBoatsInInventory --;
         BoatsAlive ++;
     }
+    //allows a player to place his boats from his inventory to his board one by one using controlled keyboard inputs
     void PlaceTheBoats(){
         string s;
         int i;
@@ -462,7 +463,7 @@ class Player{
                 }
             }while (s != "0" && s != "1");
             SelectBoat(i, stoi(s));
-            printf("\033c");
+            printf("\033c"); //clears the console (linux) system("CLS"); for windows
             DisplayBoard();
             cout << "This is your selected Boat" << endl
                  << endl;
@@ -484,6 +485,7 @@ class Player{
         }
         DisplayBoard();
     }
+    //allow a player(current object) to strike another player (object in parameters) and return the result of his strike
     string Strike(int x, int y, Player &p){
         string s;
         s = OpponentBoard.Strike(x,y);
@@ -495,6 +497,7 @@ class Player{
         }
         return s;
     }
+    //verify the cell wasn't stuck before
     int VerifyStrike(int x, int y){
         return OpponentBoard.grid[x][y][1] == 0;
     }
@@ -503,6 +506,7 @@ class Player{
         OpponentBoard = p.YourBoard;
         p.OpponentBoard = YourBoard;
     }
+    //allows a player to keep striking his opponent and show the result of previous strikes untill he misses or the game ends using controlled keyboard inputs
     string PlayTurn(string Hits,Player &p){
         string s;
         tuple<int, int> t;
