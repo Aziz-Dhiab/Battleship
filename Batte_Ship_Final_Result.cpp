@@ -530,8 +530,11 @@ class Player{
         while (Turn == 1){
             printf("\033c");
             display();
-            cout<< Hits;
-            cout<< "Please enter the coordinates to strike : ";
+            cout << setw(118)<<  "-------- Your Strikes --------" << endl<<endl;
+            cout << Hits;
+
+
+            cout<<endl<<setw(124)<< "Please enter the coordinates to strike : ";
             while (1){
                 cin >> s;
                 s[0] = toupper(s[0]);
@@ -541,13 +544,15 @@ class Player{
                         break;
                     }
                 }
-                cout << "Invalid coordinates, please try again : ";
+                cout<<setw(124) << "Invalid coordinates, please try again : ";
             }
-            Hits = Hits + Strike(get<0>(t), get<1>(t), p) + " at " + s + "\n";
+            Hits = Hits +"\t\t\t\t\t\t\t\t\t\t\t\t  "+ Strike(get<0>(t), get<1>(t), p) + " at " + s + "\n";
             if (p.BoatsAlive == 0){break;}
             printf("\033c");
             display();
+            cout << setw(118)<<  "-------- Your Strikes --------" << endl;
             cout<< Hits;
+
         }
         return Hits;
     }
@@ -706,46 +711,38 @@ public:
                         p2 = Player("belgium");
                     }
                     printf("\033c");
-                    system("CLS");
-                    system("Color 0A");
-                    for (int i = 0; i < 17; i++) {
-                        cout << endl;
-                    }
-                    cout<< setw(115) << "It\'s the first player turn" << endl;
-                    cout<< setw(114) << "Press any key to continue ";
-                    cin >> s;
-                    printf("\033c");
-
                     loadingBar();
                     printf("\033c");
-
-                    p1.PlaceTheBoats();
-
-
-                    cout <<  endl<<endl<<endl<< setw(117) << "First player\'s turn is finished" << endl;
-                    cout << setw(116)<< "Press any key to continue ";
-                    cin >> s;
-                    printf("\033c");
+                    system("CLS");
                     system("Color F1");
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
-                    cout<< setw(115) << "It\'s the second player turn" << endl;
+                    cout<< setw(115) << "It\'s the First player turn" << endl;
                     cout<< setw(114) << "Press any key to continue ";
                     cin >> s;
                     printf("\033c");
-
-
-                    p2.PlaceTheBoats();
-
-                    p1.Initialize(p2);
-
+                    p1.PlaceTheBoats();
+                    cout <<  endl<<endl<<endl<< setw(117) << "First player\'s turn is finished" << endl;
+                    cout << setw(115)<< "Press any key to continue ";
+                    cin >> s;
                     printf("\033c");
                     system("Color F1");
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
-                    cout<< setw(115) << "It\'s the first player turn" << endl;
+                    cout<< setw(115) << "It\'s the Second player turn" << endl;
+                    cout<< setw(114) << "Press any key to continue ";
+                    cin >> s;
+                    printf("\033c");
+                    p2.PlaceTheBoats();
+                    p1.Initialize(p2);
+                    printf("\033c");
+                    system("Color F1");
+                    for (int i = 0; i < 17; i++) {
+                        cout << endl;
+                    }
+                    cout<< setw(115) << "It\'s the First player turn" << endl;
                     cout<< setw(114) << "Press any key to continue ";
                     cin >> s;
                     printf("\033c");
@@ -757,9 +754,7 @@ public:
                             printf("\033c");
                             p1.display();
                             cout << setw(123)<<  "-------- Your Opponent's Strikes --------" << endl;
-                            cout << setw(123)<< Hits;
-                            cout << setw(123)<< "Press any key to continue ";
-                            cin >> s;
+                            cout << Hits;
                             Hits = "";
                         }
 
@@ -767,40 +762,38 @@ public:
                         if (p2.GetBoatsAlive() == 0){break;}
 
                         cout << endl<< setw(117)  << "First player\'s turn is finished" << endl;
-                        cout << setw(114)<< "Press any key to continue ";
+                        cout << setw(115)<< "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
                         system("Color F1");
                         for (int i = 0; i < 17; i++) {
                         cout << endl;
                         }
-                        cout<< setw(115) << "It\'s the second player turn" << endl;
+                        cout<< setw(115) << "It\'s the Second player turn" << endl;
                         cout<< setw(114) << "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
-
                         p2.BeginTurn();
                         if (Hits != ""){
                             printf("\033c");
                             p2.display();
                             cout << setw(123)<<  "-------- Your Opponent's Strikes --------" << endl;
-                            cout << setw(123)<< Hits;
-                            cout << setw(123)<< "Press any key to continue ";
-                            cin >> s;
+                            cout << Hits;
                             Hits = "";
                         }
+
                         Hits = p2.PlayTurn(Hits,p1);
                         if (p1.GetBoatsAlive() == 0){break;}
 
                         cout <<  endl<<endl<<endl<< setw(117)<< "Second player\'s turn is finished" << endl;
-                        cout << setw(116)<< "Press any key to continue ";
+                        cout << setw(115)<< "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
                         system("Color F1");
                         for (int i = 0; i < 17; i++) {
                         cout << endl;
                         }
-                        cout<< setw(115) << "It\'s the second player turn" << endl;
+                        cout<< setw(115) << "It\'s the First player turn" << endl;
                         cout<< setw(114) << "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
@@ -812,13 +805,15 @@ public:
                         printf("\033c");
                         system("Color 0A");
                         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                        cout<< setw(114)<< "The first player wins" << endl;
+                        cout<< setw(114)<< "The First player wins" << endl<<endl;
+                        cout<< setw(113)<< "CONGRADULATIONS !!!" << endl;
                     }else{
                         p2.display();
                         printf("\033c");
                         system("Color 0A");
                         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                        cout <<setw(114)<< "The second player wins" << endl;
+                        cout <<setw(114)<< "The Second player wins" << endl<<endl;
+                        cout<< setw(113)<< "CONGRADULATIONS !!!" << endl;
                     }
 				}
 
@@ -877,20 +872,20 @@ public:
 
         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         cout<< setw(114)<<"L O A D I N G . . .";
-        printf("\n\n\t\t\t\t\t\t\t\t\t\t\t   ");
+        printf("\n\n\t\t\t\t\t\t\t\t\t\t\t      ");
 
 
         // Print initial loading bar
-        for (int i = 0; i < 26; i++)
+        for (int i = 0; i < 20; i++)
             printf("%c", a);
 
         // Set the cursor again starting
         // point of loading bar
         printf("\r");
-        printf("\t\t\t\t\t\t\t\t\t\t\t   ");
+        printf("\t\t\t\t\t\t\t\t\t\t\t      ");
 
         // Print loading bar progress
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 20; i++) {
             printf("%c", b);
 
             // Sleep for 1 second
