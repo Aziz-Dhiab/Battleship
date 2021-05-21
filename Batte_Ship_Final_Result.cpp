@@ -219,11 +219,11 @@ class Board{
         }
         cout << endl;
 
-        cout <<setw(87)<<(char)201; //top part of the grid
+        cout <<setw(87)<<(char)201; //top part of the grid, 201 : " ╔ "
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << (char)205<< (char)205<< (char)205<< (char)203;
+            cout << (char)205<< (char)205<< (char)205<< (char)203; // 205 : " ═ ",203 : " ╦ "
         }
-        cout << (char)205<< (char)205<< (char)205<< (char)187 << endl;
+        cout << (char)205<< (char)205<< (char)205<< (char)187 << endl; // 187 : " ╗ "
 
         for (int i = 0; i < MaxLength; i++){
             cout <<setw(85)<< char(letter) << " ";
@@ -234,30 +234,30 @@ class Board{
                 if (grid[i][j][0] == 1){
                     s = "O";          //"O" if on windows shell  //represnets unhit cell that contains a boat
                     if (grid[i][j][1] == 1){
-                        s = (char)232;   //"Ø" if on windows shell          //represnets hit cell that contains a boat"ø×Ø•θΘΦΟOₒ"
+                        s = (char)232;   //"Ø" if on windows shell          // represnets hit cell that contains a boat"ø×Ø•θΘΦΟOₒ"
                     }
                 }else{
                     if (grid[i][j][1] == 1){
-                        s = (char)88;                                  //represnets hit cell that doesn't contain a bot
+                        s = (char)88;                          //  88 : " X ", represnets hit cell that doesn't contain a bot
                     }
                 }
-                cout << (char)186<<" " << s << " ";
+                cout << (char)186<<" " << s << " "; // 186 : " ║ "
             }
-            cout << (char)186<<" " << endl;
+            cout << (char)186<<" " << endl; // 186 : " ║ "
             if (i < MaxLength - 1){   //condition so you don't draw an extra line
-                cout <<setw(87)<< (char)204;
+                cout <<setw(87)<< (char)204; // 204 : " ╠ "
                 for (int l = 0; l < MaxWidth - 1; l++){
-                    cout << (char)205<< (char)205<< (char)205<< (char)206;
+                    cout << (char)205<< (char)205<< (char)205<< (char)206; // 205 : " ═ ", 206 : " ╬ "
                 }
-                cout << (char)205<< (char)205<< (char)205<< (char)185 << endl;
+                cout << (char)205<< (char)205<< (char)205<< (char)185 << endl; // 185 : " ╣ "
             }
         }
 
-        cout <<setw(87)<<(char)200; //bottom part of the grid
+        cout <<setw(87)<<(char)200; //bottom part of the grid, 200 : " ╚ "
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << (char)205<< (char)205<< (char)205<< (char)202;
+            cout << (char)205<< (char)205<< (char)205<< (char)202; // 205 : " ═ ", 202 : " ╩ "
         }
-        cout<< (char)205<< (char)205<< (char)205 << (char)188 << endl;
+        cout<< (char)205<< (char)205<< (char)205 << (char)188 << endl; // 188 : " ╝ "
     }
     //display an opponent's board with only the hits and the damaged cells
     void OpponentDisplay(){
@@ -268,11 +268,11 @@ class Board{
         }
         cout << endl;
 
-        cout <<setw(87)<< (char)201; //top part of the grid
+        cout <<setw(87)<< (char)201; //top part of the grid, 201 : " ╔ "
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << (char)205<< (char)205<< (char)205<< (char)203;
+            cout << (char)205<< (char)205<< (char)205<< (char)203; // 205 : " ═ ",203 : " ╦ "
         }
-        cout << (char)205<< (char)205<< (char)205<< (char)187 << endl;
+        cout << (char)205<< (char)205<< (char)205<< (char)187 << endl; // 187 : " ╗ "
 
         for (int i = 0; i < MaxLength; i++){
             cout <<setw(85)<< char(letter) << " ";
@@ -286,23 +286,23 @@ class Board{
                         s = (char)232;//"Ø" if on windows shell
                     }
                 }
-                cout << (char)186 <<" "<< s << " ";
+                cout << (char)186 <<" "<< s << " "; // 186 : " ║ "
             }
-            cout << (char)186 <<" "<< endl;
+            cout << (char)186 <<" "<< endl; // 186 : " ║ "
             if (i < MaxLength - 1){ //condition so you don't draw an extra line
-                cout <<setw(87)<<(char)204;
+                cout <<setw(87)<<(char)204; // 204 : " ╠ "
                 for (int l = 0; l < MaxWidth - 1; l++){
-                    cout << (char)205<< (char)205<< (char)205<< (char)206;
+                    cout << (char)205<< (char)205<< (char)205<< (char)206; // 205 : " ═ ", 206 : " ╬ "
                 }
-                cout<< (char)205<< (char)205<< (char)205 << (char)185 << endl;
+                cout<< (char)205<< (char)205<< (char)205 << (char)185 << endl; // 185 : " ╣ "
             }
         }
 
-        cout <<setw(87)<< (char)200; //bottom part of the grid
+        cout <<setw(87)<< (char)200; //bottom part of the grid, 200 : " ╚ "
         for (int k = 0; k < MaxWidth - 1; k++){
-            cout << (char)205<< (char)205<< (char)205<< (char)202;
+            cout << (char)205<< (char)205<< (char)205<< (char)202; // 205 : " ═ ", 202 : " ╩ "
         }
-        cout << (char)205<< (char)205<< (char)205<< (char)188 << endl;
+        cout << (char)205<< (char)205<< (char)205<< (char)188 << endl; // 188 : " ╝ "
     }
 };
 // represents one of two players in a given game
@@ -632,25 +632,25 @@ private:
 
 public:
 	void print_game_title() {
-		system("Color 3A");
+		system("Color 3A"); // 3 - Bluish Background, A - Green Foreground
 		printf("\n\n\n\n");
 		for (int i = 0; i < title_row; i++) {
 			cout << setw(83);
 			for (int j = 0; j < title_col; j++) {
 				if (game_title[i][j] == '#') {
-					cout << (char)219;
+					cout << (char)219; // 219 : " █ "
 				}
 				else if (game_title[i][j] == '!') {
-					cout << (char)178;
+					cout << (char)178; // 178 : " ▓ "
 				}
 				else if (game_title[i][j] == '+') {
-					cout << (char)43;
+					cout << (char)43; // 43 : " + "
 				}
 				else if (game_title[i][j] == '@') {
-					cout << (char)233;
+					cout << (char)233; // 
 				}
 				else if (game_title[i][j] == '$') {
-					cout << (char)173;
+					cout << (char)173; // " ¡ "
 				}
 				else {
 					cout << (char)32;
@@ -664,7 +664,7 @@ public:
 			cout << setw(90);
 			for (int j = 0; j < options_col; j++) {
 				if (i == arrow_row && j == arrow_col) {
-					cout << (char)175;
+					cout << (char)175;   // 175 : " » "
 				}
 				cout << options[i][j];
 			}cout << endl;
@@ -673,10 +673,10 @@ public:
 	}
 	void player_chooses_options() {
 		while (1) {
-			if (kbhit()) {
+			if (kbhit()) {   // kbhit() : checks if the User did click in a key from keyboard
 				options_move = getch();
-				if (arrow_row == 0 && arrow_col == 0 && options_move == 13) {
-					system("CLS");
+				if (arrow_row == 0 && arrow_col == 0 && options_move == 13) {  // 13 :User pressed Enter key
+					system("CLS"); // Clears the screen
 					string s;
                     int i;
                     tuple<int, int> t;
@@ -685,8 +685,8 @@ public:
                     Player p2;
                     //Sleep(300);
                     printf("\033c");
-                    system("CLS");
-                    system("Color 0A");
+                    system("CLS"); // Clears the screen
+                    system("Color 0A"); // 0 - Black Background, A - Green Foreground
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
@@ -713,8 +713,8 @@ public:
                     printf("\033c");
                     loadingBar();
                     printf("\033c");
-                    system("CLS");
-                    system("Color F1");
+                    system("CLS"); // Clears the screen
+                    system("Color F1"); // F - White Background, 1 - Blue Foreground
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
@@ -727,7 +727,7 @@ public:
                     cout << setw(115)<< "Press any key to continue ";
                     cin >> s;
                     printf("\033c");
-                    system("Color F1");
+                    system("Color F1"); // F - White Background, 1 - Blue Foreground
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
@@ -738,7 +738,7 @@ public:
                     p2.PlaceTheBoats();
                     p1.Initialize(p2);
                     printf("\033c");
-                    system("Color F1");
+                    system("Color F1"); // F - White Background, 1 - Blue Foreground
                     for (int i = 0; i < 17; i++) {
                         cout << endl;
                     }
@@ -765,7 +765,7 @@ public:
                         cout << setw(115)<< "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
-                        system("Color F1");
+                        system("Color F1"); // F - White Background, 1 - Blue Foreground
                         for (int i = 0; i < 17; i++) {
                         cout << endl;
                         }
@@ -789,7 +789,7 @@ public:
                         cout << setw(115)<< "Press any key to continue ";
                         cin >> s;
                         printf("\033c");
-                        system("Color F1");
+                        system("Color F1"); // F - White Background, 1 - Blue Foreground
                         for (int i = 0; i < 17; i++) {
                         cout << endl;
                         }
@@ -803,14 +803,14 @@ public:
                     if (p2.GetBoatsAlive() == 0){
                         p1.display();
                         printf("\033c");
-                        system("Color 0A");
+                        system("Color 0A"); // 0 - Black Background, A - Green Foreground
                         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                         cout<< setw(114)<< "The First player wins" << endl<<endl;
                         cout<< setw(113)<< "CONGRADULATIONS !!!" << endl;
                     }else{
                         p2.display();
                         printf("\033c");
-                        system("Color 0A");
+                        system("Color 0A"); // 0 - Black Background, A - Green Foreground
                         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                         cout <<setw(114)<< "The Second player wins" << endl<<endl;
                         cout<< setw(113)<< "CONGRADULATIONS !!!" << endl;
@@ -818,9 +818,9 @@ public:
 				}
 
 
-				else if (arrow_row == 1 && arrow_col == 0 && options_move == 13) {
-					system("CLS");
-					system("Color 3A");
+				else if (arrow_row == 1 && arrow_col == 0 && options_move == 13) {  // 13 :User pressed Enter key
+					system("CLS"); // Clears the screen
+					system("Color 3A");  // 3 - Bluish Background, A - Green Foreground
 					for (int i = 0; i < 18; i++) {
 						cout << endl;
 					}cout << setw(100);
@@ -833,26 +833,26 @@ public:
 					Sleep(5000);
 					exit(0);
 				}
-				else if (options_move == 27) {
-					system("CLS");
+				else if (options_move == 27) {  // 27 :User pressed Esc(Echap) key
+					system("CLS"); // Clears the screen
 					print_game_title();
 					print_options();
 				}
 				else if (options_move == -32) {
 					upordown = getch();
 					switch (upordown) {
-					case 72:
+					case 72:              // 72 :User pressed Up key
 						if (arrow_row > 0) {
 							arrow_row--;
 						}
-						break;
+						break;            // 80 :User pressed Down key
 					case 80:
-						if (arrow_row < options_row - 1) {
+						if (arrow_row < 1) {
 							arrow_row++;
 						}
 						break;
 					}
-					system("CLS");
+					system("CLS"); // Clears the screen
 					print_game_title();
 					print_options();
 				}
@@ -868,7 +868,7 @@ public:
 
         // Initialize char for printing
         // loading bar
-        char a = 177, b = 219;
+        char a = 177 , b = 219; // 177 : ▒ , 219 : █
 
         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         cout<< setw(114)<<"L O A D I N G . . .";
